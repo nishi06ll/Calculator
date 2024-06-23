@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2A4386;
+            margin: 0;
+        }
+        .calculator {
+            background-color: #2A3C60;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 280px;
+        }
+        .display-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #67AB94;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .display {
+            color: #333;
+            font-size: 24px;
+            white-space: nowrap;
+        }
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .button {
+            width: 22%;
+            padding: 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 2px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .button.number {
+            background-color: #3B536C;
+            color: white;
+        }
+        .button.number:hover {
+            background-color: #4C6D8B;
+        }
+        .button.operator {
+            background-color: #333B50;
+            color: white;
+        }
+        .button.operator:hover {
+            background-color: #4C576E;
+        }
+        .button.equals {
+            background-color: #667F9B;
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .button.equals:hover {
+            background-color: #7D94B2;
+        }
+        .button.clear {
+            background-color: #AC3C3C;
+            color: white;
+        }
+        .button.clear:hover {
+            background-color: #C24D4D;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display-container">
+            <div id="display" class="display">0</div>
+        </div>
+        <div class="button-row">
+            <button class="button number" onclick="inputDigit(7)">7</button>
+            <button class="button number" onclick="inputDigit(8)">8</button>
+            <button class="button number" onclick="inputDigit(9)">9</button>
+            <button class="button operator" onclick="setOperator('/')">/</button>
+        </div>
+        <div class="button-row">
+            <button class="button number" onclick="inputDigit(4)">4</button>
+            <button class="button number" onclick="inputDigit(5)">5</button>
+            <button class="button number" onclick="inputDigit(6)">6</button>
+            <button class="button operator" onclick="setOperator('*')">*</button>
+        </div>
+        <div class="button-row">
+            <button class="button number" onclick="inputDigit(1)">1</button>
+            <button class="button number" onclick="inputDigit(2)">2</button>
+            <button class="button number" onclick="inputDigit(3)">3</button>
+            <button class="button operator" onclick="setOperator('-')">-</button>
+        </div>
+        <div class="button-row">
+            <button class="button clear" onclick="clearDisplay()">AC</button>
+            <button class="button number" onclick="inputDigit(0)">0</button>
+            <button class="button number" onclick="inputDecimal()">.</button>
+            <button class="button operator" onclick="setOperator('+')">+</button>
+        </div>
+        <div class="button-row">
+            <button class="button equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let operator = null;
+        let firstOperand = null;
+        let secondOperand = false;
+
+        function inputDigit(digit) {
+            if (secondOperand === true) {
+                currentInput = digit.toString();
+                secondOperand = false;
+            } else {
+                currentInput = currentInput === '0' ? digit.toString() : currentInput + digit.toString();
+            }
+            updateDisplay();
+        }
+
+        function inputDecimal() {
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            operator = null;
+            firstOperand = null;
+            secondOperand = false;
+            updateDisplay();
+        }
+
+        function setOperator(nextOperator) {
+            if (firstOperand === null) {
+                firstOperand = parseFloat(currentInput);
+            } else if (operator) {
+                const result = performCalculation(firstOperand, parseFloat(currentInput), operator);
+                currentInput = `${parseFloat(result.toFixed(7))}`;
+                firstOperand = result;
+            }
+            operator = nextOperator;
+            secondOperand = true;
+            updateDisplay();
+        }
+
+        function performCalculation(first, second, operator) {
+            switch (operator) {
+                case '+':
+                    return first + second;
+                case '-':
+                    return first - second;
+                case '*':
+                    return first * second;
+                case '/':
+                    return first / second;
+                default:
+                    return second;
+            }
+        }
+
+        function calculate() {
+            let result = performCalculation(firstOperand, parseFloat(currentInput), operator);
+            currentInput = `${parseFloat(result.toFixed(7))}`;
+            operator = null;
+            firstOperand = null;
+            secondOperand = false;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.querySelector('.display');
+            display.textContent = `${firstOperand !== null ? firstOperand : ''}${operator !== null ? ' ' + operator + ' ' : ''}${secondOperand ? '' : currentInput}`;
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
